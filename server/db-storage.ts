@@ -1,13 +1,16 @@
 import { 
   employees, 
   events, 
-  timeRecords, 
+  timeRecords,
+  users,
   type Employee, 
   type InsertEmployee, 
   type Event, 
   type InsertEvent, 
   type TimeRecord, 
   type InsertTimeRecord,
+  type User,
+  type InsertUser,
   EmployeeStatus,
   type EmployeeWithStatus
 } from "@shared/schema";
@@ -190,5 +193,45 @@ export class DatabaseStorage implements IStorage {
     }
     
     return result;
+  }
+
+  // User methods
+  async getUsers(): Promise<User[]> {
+    return db.select().from(users);
+  }
+  
+  async getUser(id: number): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.id, id));
+    return result.length ? result[0] : undefined;
+  }
+  
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.username, username));
+    return result.length ? result[0] : undefined;
+  }
+  
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.email, email));
+    return result.length ? result[0] : undefined;
+  }
+  
+  async createUser(user: InsertUser): Promise<User> {
+    const [newUser] = await db.insert(users).values(user).returning();
+    return newUser;
+  }
+  
+  async updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined> {
+    const [updatedUser] = await db
+      .update(users)
+      .set(user)
+      .where(eq(users.id, id))
+      .returning();
+    
+    return updatedUser;
+  }
+  
+  async deleteUser(id: number): Promise<boolean> {
+    const result = await db.delete(users).where(eq(users.id, id));
+    return !!result;
   }
 }

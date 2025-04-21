@@ -1,13 +1,16 @@
 import { 
   employees, 
   events, 
-  timeRecords, 
+  timeRecords,
+  users,
   type Employee, 
   type InsertEmployee, 
   type Event, 
   type InsertEvent, 
   type TimeRecord, 
   type InsertTimeRecord,
+  type User,
+  type InsertUser,
   EmployeeStatus,
   type EmployeeWithStatus
 } from "@shared/schema";
@@ -32,6 +35,15 @@ export interface IStorage {
   getTimeRecords(employeeId?: number, eventId?: number): Promise<TimeRecord[]>;
   getTimeRecord(id: number): Promise<TimeRecord | undefined>;
   createTimeRecord(timeRecord: InsertTimeRecord): Promise<TimeRecord>;
+  
+  // User operations
+  getUsers(): Promise<User[]>;
+  getUser(id: number): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined>;
+  deleteUser(id: number): Promise<boolean>;
   
   // Business logic operations
   getEmployeeStatus(employeeId: number, eventId: number): Promise<EmployeeStatus>;
@@ -209,6 +221,47 @@ export class MemStorage implements IStorage {
     }
     
     return result;
+  }
+
+  // User methods - geralmente não usadas na versão MemStorage, mas implementadas para a interface
+  private usersStore: Map<number, User> = new Map();
+  private userIdCounter: number = 1;
+
+  async getUsers(): Promise<User[]> {
+    return Array.from(this.usersStore.values());
+  }
+
+  async getUser(id: number): Promise<User | undefined> {
+    return this.usersStore.get(id);
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return Array.from(this.usersStore.values()).find(user => user.username === username);
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return Array.from(this.usersStore.values()).find(user => user.email === email);
+  }
+
+  async createUser(user: InsertUser): Promise<User> {
+    const id = this.userIdCounter++;
+    const now = new Date();
+    const newUser: User = { ...user, id, createdAt: now, lastLogin: null };
+    this.usersStore.set(id, newUser);
+    return newUser;
+  }
+
+  async updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined> {
+    const existingUser = this.usersStore.get(id);
+    if (!existingUser) return undefined;
+    
+    const updatedUser = { ...existingUser, ...user };
+    this.usersStore.set(id, updatedUser);
+    return updatedUser;
+  }
+
+  async deleteUser(id: number): Promise<boolean> {
+    return this.usersStore.delete(id);
   }
 }
 
