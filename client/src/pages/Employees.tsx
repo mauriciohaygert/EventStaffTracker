@@ -38,8 +38,8 @@ const Employees = () => {
   } = useEmployeeContext();
   
   const [searchTerm, setSearchTerm] = useState("");
-  const [roleFilter, setRoleFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState({ field: "name", direction: "asc" });
   
@@ -59,8 +59,8 @@ const Employees = () => {
   const filteredEmployees = employees ? employees.filter((employee: EmployeeWithStatus) => {
     const matchesSearch = employee.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          employee.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = roleFilter ? employee.role === roleFilter : true;
-    const matchesStatus = statusFilter ? employee.status === statusFilter : true;
+    const matchesRole = roleFilter && roleFilter !== "all" ? employee.role === roleFilter : true;
+    const matchesStatus = statusFilter && statusFilter !== "all" ? employee.status === statusFilter : true;
     
     return matchesSearch && matchesRole && matchesStatus;
   }) : [];
@@ -181,7 +181,7 @@ const Employees = () => {
                 <SelectValue placeholder="Todos os Departamentos" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos os Departamentos</SelectItem>
+                <SelectItem value="all">Todos os Departamentos</SelectItem>
                 <SelectItem value="Segurança">Segurança</SelectItem>
                 <SelectItem value="Recepção">Recepção</SelectItem>
                 <SelectItem value="Técnico">Técnico</SelectItem>
@@ -194,7 +194,7 @@ const Employees = () => {
                 <SelectValue placeholder="Todos os Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos os Status</SelectItem>
+                <SelectItem value="all">Todos os Status</SelectItem>
                 <SelectItem value="working">Trabalhando</SelectItem>
                 <SelectItem value="on_break">Em Pausa</SelectItem>
                 <SelectItem value="checked_out">Saída</SelectItem>

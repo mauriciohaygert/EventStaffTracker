@@ -25,7 +25,7 @@ const Shifts = () => {
   const { selectedEvent } = useEmployeeContext();
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [view, setView] = useState("day");
-  const [employeeFilter, setEmployeeFilter] = useState("");
+  const [employeeFilter, setEmployeeFilter] = useState("all");
   
   // Fetch time records
   const { data: timeRecords, isLoading } = useQuery({
@@ -159,7 +159,7 @@ const Shifts = () => {
                 <SelectValue placeholder="Filtrar por funcionário" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos os funcionários</SelectItem>
+                <SelectItem value="all">Todos os funcionários</SelectItem>
                 {employees?.map((employee: any) => (
                   <SelectItem key={employee.id} value={employee.id.toString()}>
                     {employee.name}
@@ -197,10 +197,10 @@ const Shifts = () => {
                   ))}
                 </div>
               ) : (
-                employees?.length ? (
+                Array.isArray(employees) && employees.length > 0 ? (
                   <div className="space-y-4">
                     {employees
-                      .filter((employee: any) => !employeeFilter || employee.id.toString() === employeeFilter)
+                      .filter((employee: any) => employeeFilter === "all" || employee.id.toString() === employeeFilter)
                       .map((employee: any) => {
                         const employeeRecords = groupedByEmployee[employee.id] || [];
                         const hasRecords = employeeRecords.length > 0;
