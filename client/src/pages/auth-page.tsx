@@ -35,11 +35,6 @@ export default function AuthPage() {
   const { user, isLoading, loginMutation, registerMutation } = useAuth();
   const [, setLocation] = useLocation();
 
-  // Redirecionar se já estiver autenticado
-  if (user) {
-    return <Redirect to="/" />;
-  }
-
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
@@ -67,6 +62,11 @@ export default function AuthPage() {
   const onRegisterSubmit = (data: RegisterFormValues) => {
     registerMutation.mutate(data);
   };
+
+  // Redirecionar se já estiver autenticado
+  if (user) {
+    return <Redirect to="/" />;
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-50">
