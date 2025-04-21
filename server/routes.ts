@@ -8,8 +8,14 @@ import {
 } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import z from "zod";
+import { setupAuth, isAuthenticated, isAdmin, isManagerOrAdmin, createInitialAdminUser } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Configurar autenticação
+  setupAuth(app);
+  
+  // Criar usuário admin inicial
+  await createInitialAdminUser();
   // API routes
   
   // ------ Employee Routes ------
@@ -58,7 +64,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Create employee
-  app.post("/api/employees", async (req, res) => {
+  app.post("/api/employees", isManagerOrAdmin, async (req, res) => {
     try {
       const validatedData = insertEmployeeSchema.parse(req.body);
       const employee = await storage.createEmployee(validatedData);
