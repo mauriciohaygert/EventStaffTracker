@@ -160,7 +160,7 @@ const Shifts = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos os funcionários</SelectItem>
-                {employees?.map((employee: any) => (
+                {Array.isArray(employees) && employees.map((employee: any) => (
                   <SelectItem key={employee.id} value={employee.id.toString()}>
                     {employee.name}
                   </SelectItem>
