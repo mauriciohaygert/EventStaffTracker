@@ -67,24 +67,24 @@ const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-6">
             <Link href="/">
-              <a className={`text-white hover:text-gray-200 px-2 py-1 rounded font-medium ${isActive("/") ? "font-semibold" : ""}`}>
+              <span className={`text-white hover:text-gray-200 px-2 py-1 rounded font-medium ${isActive("/") ? "font-semibold" : ""} cursor-pointer`}>
                 Dashboard
-              </a>
+              </span>
             </Link>
             <Link href="/employees">
-              <a className={`text-white hover:text-gray-200 px-2 py-1 rounded font-medium ${isActive("/employees") ? "font-semibold" : ""}`}>
+              <span className={`text-white hover:text-gray-200 px-2 py-1 rounded font-medium ${isActive("/employees") ? "font-semibold" : ""} cursor-pointer`}>
                 Funcionários
-              </a>
+              </span>
             </Link>
             <Link href="/shifts">
-              <a className={`text-white hover:text-gray-200 px-2 py-1 rounded font-medium ${isActive("/shifts") ? "font-semibold" : ""}`}>
+              <span className={`text-white hover:text-gray-200 px-2 py-1 rounded font-medium ${isActive("/shifts") ? "font-semibold" : ""} cursor-pointer`}>
                 Turnos
-              </a>
+              </span>
             </Link>
             <Link href="/reports">
-              <a className={`text-white hover:text-gray-200 px-2 py-1 rounded font-medium ${isActive("/reports") ? "font-semibold" : ""}`}>
+              <span className={`text-white hover:text-gray-200 px-2 py-1 rounded font-medium ${isActive("/reports") ? "font-semibold" : ""} cursor-pointer`}>
                 Relatórios
-              </a>
+              </span>
             </Link>
           </nav>
           
@@ -168,32 +168,32 @@ const Header = () => {
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1">
             <Link href="/">
-              <a onClick={() => setMobileMenuOpen(false)} className={`block px-3 py-2 rounded-md text-white font-medium hover:bg-blue-600 ${isActive("/") ? "bg-blue-600" : ""}`}>
+              <span onClick={() => setMobileMenuOpen(false)} className={`block px-3 py-2 rounded-md text-white font-medium hover:bg-blue-600 ${isActive("/") ? "bg-blue-600" : ""} cursor-pointer`}>
                 Dashboard
-              </a>
+              </span>
             </Link>
             <Link href="/employees">
-              <a onClick={() => setMobileMenuOpen(false)} className={`block px-3 py-2 rounded-md text-white font-medium hover:bg-blue-600 ${isActive("/employees") ? "bg-blue-600" : ""}`}>
+              <span onClick={() => setMobileMenuOpen(false)} className={`block px-3 py-2 rounded-md text-white font-medium hover:bg-blue-600 ${isActive("/employees") ? "bg-blue-600" : ""} cursor-pointer`}>
                 Funcionários
-              </a>
+              </span>
             </Link>
             <Link href="/shifts">
-              <a onClick={() => setMobileMenuOpen(false)} className={`block px-3 py-2 rounded-md text-white font-medium hover:bg-blue-600 ${isActive("/shifts") ? "bg-blue-600" : ""}`}>
+              <span onClick={() => setMobileMenuOpen(false)} className={`block px-3 py-2 rounded-md text-white font-medium hover:bg-blue-600 ${isActive("/shifts") ? "bg-blue-600" : ""} cursor-pointer`}>
                 Turnos
-              </a>
+              </span>
             </Link>
             <Link href="/reports">
-              <a onClick={() => setMobileMenuOpen(false)} className={`block px-3 py-2 rounded-md text-white font-medium hover:bg-blue-600 ${isActive("/reports") ? "bg-blue-600" : ""}`}>
+              <span onClick={() => setMobileMenuOpen(false)} className={`block px-3 py-2 rounded-md text-white font-medium hover:bg-blue-600 ${isActive("/reports") ? "bg-blue-600" : ""} cursor-pointer`}>
                 Relatórios
-              </a>
+              </span>
             </Link>
             
             {/* Menu admin para versão mobile */}
             {user?.role === "admin" && (
               <Link href="/admin/users">
-                <a onClick={() => setMobileMenuOpen(false)} className={`block px-3 py-2 rounded-md text-white font-medium hover:bg-blue-600 ${isActive("/admin/users") ? "bg-blue-600" : ""}`}>
+                <span onClick={() => setMobileMenuOpen(false)} className={`block px-3 py-2 rounded-md text-white font-medium hover:bg-blue-600 ${isActive("/admin/users") ? "bg-blue-600" : ""} cursor-pointer`}>
                   Gerenciar Usuários
-                </a>
+                </span>
               </Link>
             )}
           </div>

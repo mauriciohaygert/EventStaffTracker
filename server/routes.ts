@@ -311,6 +311,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // ------ User Management Routes ------
+  
+  // Get all users (admin only)
+  app.get("/api/users", isAdmin, async (_req, res) => {
+    try {
+      const users = await storage.getUsers();
+      res.json(users);
+    } catch (err) {
+      res.status(500).json({ message: "Falha ao buscar usuários" });
+    }
+  });
+  
+  // Get user by ID (admin or self)
+  app.get("/api/users/:id", isAuthenticated, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      
+      // Verificar permissão: apenas admin ou o próprio usuário
+      if (req.user.role !== 'admin' && req.user.id !== id) {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+      
+      const user = await storage.getUser(id);
+      
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+      
+      res.json(user);
+    } catch (err) {
+      res.status(500).json({ message: "Falha ao buscar usuário" });
+    }
+  });
+  
+  // Update user (admin or self)
+  app.patch("/api/users/:id", isAuthenticated, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      
+      // Verificar permissão: apenas admin ou o próprio usuário
+      if (req.user.role !== 'admin' && req.user.id !== id) {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+      
+      // Apenas admin pode alterar o papel (role) de um usuário
+      if (req.body.role && req.user.role !== 'admin') {
+        return res.status(403).json({ message: "Você não tem permissão para alterar o papel do usuário" });
+      }
+      
+      const user = await storage.getUser(id);
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+      
+      // Atualizar dados
+      const updateData = { ...req.body };
+      const updatedUser = await storage.updateUser(id, updateData);
+      
+      res.json(updatedUser);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        const validationError = fromZodError(err);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ message: "Falha ao atualizar usuário" });
+    }
+  });
+  
+  // Delete user (admin only)
+  app.delete("/api/users/:id", isAdmin, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      const success = await storage.deleteUser(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+      
+      res.status(204).send();
+    } catch (err) {
+      res.status(500).json({ message: "Falha ao excluir usuário" });
+    }
+  });
+  
   // ------ QR Code Scanning Route ------
   
   // Process a code scan
