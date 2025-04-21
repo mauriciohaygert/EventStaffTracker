@@ -5,15 +5,30 @@ import {
   Users, 
   ChevronDown, 
   Menu, 
-  X
+  X,
+  LogOut,
+  Settings,
+  User,
+  UserPlus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 import { useEmployeeContext } from "@/context/EmployeeContext";
+import { useAuth } from "@/hooks/use-auth";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const Header = () => {
   const [location] = useLocation();
   const { setShowQRScanModal } = useEmployeeContext();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, logoutMutation } = useAuth();
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(prev => !prev);
@@ -23,6 +38,21 @@ const Header = () => {
     // Use exact match for home, prefix match for other routes
     if (path === "/") return location === "/";
     return location.startsWith(path);
+  };
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
+  };
+
+  // Função para obter as iniciais do usuário para o avatar
+  const getUserInitials = () => {
+    if (!user) return "U";
+    
+    if (user.firstName && user.lastName) {
+      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+    }
+    
+    return user.username.substring(0, 2).toUpperCase();
   };
 
   return (
@@ -68,12 +98,55 @@ const Header = () => {
             >
               <QrCode className="h-4 w-4" />
             </Button>
-            <div className="relative">
-              <button className="flex items-center space-x-1">
-                <span className="hidden md:inline">Admin</span>
-                <ChevronDown className="h-4 w-4" />
-              </button>
-            </div>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full focus:ring-0 focus:ring-offset-0">
+                  <Avatar className="h-8 w-8 bg-secondary text-primary">
+                    <AvatarFallback>{getUserInitials()}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      {user?.firstName && user?.lastName 
+                        ? `${user.firstName} ${user.lastName}` 
+                        : user?.username}
+                    </p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {user?.email}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Perfil</span>
+                </DropdownMenuItem>
+                
+                {/* Item apenas para administradores */}
+                {user?.role === "admin" && (
+                  <Link href="/admin/users">
+                    <DropdownMenuItem>
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      <span>Gerenciar Usuários</span>
+                    </DropdownMenuItem>
+                  </Link>
+                )}
+                
+                <DropdownMenuItem>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Configurações</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sair</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           
           {/* Mobile menu button */}
@@ -114,6 +187,15 @@ const Header = () => {
                 Relatórios
               </a>
             </Link>
+            
+            {/* Menu admin para versão mobile */}
+            {user?.role === "admin" && (
+              <Link href="/admin/users">
+                <a onClick={() => setMobileMenuOpen(false)} className={`block px-3 py-2 rounded-md text-white font-medium hover:bg-blue-600 ${isActive("/admin/users") ? "bg-blue-600" : ""}`}>
+                  Gerenciar Usuários
+                </a>
+              </Link>
+            )}
           </div>
         </div>
       )}

@@ -10,9 +10,13 @@ import Dashboard from "@/pages/Dashboard";
 import Employees from "@/pages/Employees";
 import Shifts from "@/pages/Shifts";
 import Reports from "@/pages/Reports";
+import AdminUsers from "@/pages/AdminUsers";
+import AuthPage from "@/pages/auth-page";
 import NotFound from "@/pages/not-found";
 
 import { EmployeeProvider } from "@/context/EmployeeContext";
+import { AuthProvider } from "@/hooks/use-auth";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 function App() {
   // Preload events for the whole application
@@ -24,20 +28,52 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <EmployeeProvider>
-          <Layout>
+      <AuthProvider>
+        <TooltipProvider>
+          <EmployeeProvider>
             <Switch>
-              <Route path="/" component={Dashboard} />
-              <Route path="/employees" component={Employees} />
-              <Route path="/shifts" component={Shifts} />
-              <Route path="/reports" component={Reports} />
+              <Route path="/auth" component={AuthPage} />
+              
+              <ProtectedRoute path="/" component={() => (
+                <Layout>
+                  <Dashboard />
+                </Layout>
+              )} />
+
+              <ProtectedRoute path="/employees" component={() => (
+                <Layout>
+                  <Employees />
+                </Layout>
+              )} />
+
+              <ProtectedRoute path="/shifts" component={() => (
+                <Layout>
+                  <Shifts />
+                </Layout>
+              )} />
+
+              <ProtectedRoute path="/reports" component={() => (
+                <Layout>
+                  <Reports />
+                </Layout>
+              )} />
+
+              <ProtectedRoute 
+                path="/admin/users" 
+                component={() => (
+                  <Layout>
+                    <AdminUsers />
+                  </Layout>
+                )} 
+                roles={["admin"]}
+              />
+              
               <Route component={NotFound} />
             </Switch>
-          </Layout>
-          <Toaster />
-        </EmployeeProvider>
-      </TooltipProvider>
+            <Toaster />
+          </EmployeeProvider>
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
